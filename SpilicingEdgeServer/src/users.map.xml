@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.restlet.dao.ICustomerDao">
+	<resultMap type="Users" id="userMap">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="password" column="password" />
+		<result property="address" column="address" />
+	</resultMap>
+	<select id="getUser" parameterType="Users" resultType="Users">
+		SELECT *
+		FROM users WHERE id = #{id}
+	</select>
+	<select id="getAllUser" resultType="Users">
+		SELECT * FROM users
+	</select>
+	<insert id="addUser" parameterType="Users" flushCache="true">
+		INSERT
+		INTO users (id,name,password,address) VALUES
+		(#{id},#{name},#{password},#{address})
+	</insert>
+	<update id="updateUser" parameterType="Users">
+		UPDATE users SET
+		name=#{name},password=#{password},address=#{address} WHERE id=#{id}
+	</update>
+	<delete id="deleteUser" parameterType="int">
+		DELETE FROM users WHERE
+		id=#{id}
+	</delete>
+</mapper> 

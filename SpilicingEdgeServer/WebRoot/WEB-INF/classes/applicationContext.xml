@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="byName"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>classpath:jdbc.properties</value>
+		</property>
+		<property name="fileEncoding" value="utf-8" />
+	</bean>
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${driverClassName}" />
+		<property name="url" value="${url}" />
+		<property name="username" value="${username}" />
+		<property name="password" value="${password}" />
+		<property name="maxActive" value="${maxActive}" />
+		<property name="maxIdle" value="${maxIdle}" />
+		<property name="maxWait" value="${maxWait}" />
+		<property name="defaultAutoCommit" value="${defaultAutoCommit}" />
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations" value="classpath:*.map.xml" />
+		<property name="typeAliasesPackage" value="com.restlet.entity" />
+	</bean>
+
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+
+	<bean name="root" class="org.restlet.ext.spring.SpringRouter">
+		<property name="attachments">
+			<map>
+				<entry key="/customers">
+					<bean class="org.restlet.ext.spring.SpringFinder">
+						<lookup-method name="create" bean="customersResource" />
+					</bean>
+				</entry>
+				<entry key="/customers/{customerId}">
+					<bean class="org.restlet.ext.spring.SpringFinder">
+						<lookup-method name="create" bean="customersResource" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="customersResource" class="com.restlet.resources.CustomerResource"
+		scope="prototype">
+		<property name="customerDao" ref="customerDao" />
+	</bean>
+
+	<bean id="customerDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.restlet.dao.ICustomerDao"></property>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+
+</beans>
